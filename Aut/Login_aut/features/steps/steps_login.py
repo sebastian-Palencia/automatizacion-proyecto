@@ -7,6 +7,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 
 from Aut.supports.Funciones_globales import Funciones_Globales
 
@@ -30,15 +31,13 @@ def obtener_mensaje_error(xpath, error_message):
     f.adjuntar_captura_de_pantalla_a_reporte()
     raise AssertionError("El mensaje de error no coincide")
 
-
-
 @given(u'I am on the login page')
 def step_impl(context):
     global driver, f
     service = Service(r"C:\Repo\Selenium\Drivers\chromedriver.exe")
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument('--headless')
-    driver = webdriver.Chrome(service=service)#options=chrome_options)
+    driver = webdriver.Chrome(service=service, options=chrome_options)
     f =Funciones_Globales(driver)
     f.Navegar("https://yellowpush.b2clogin.com/yellowpush.onmicrosoft.com/b2c_1_signin/oauth2/v2.0/authorize?client_id=87a9c1f5-2d71-4c36-8357-4f25c438d63b&scope=openid%20profile%20offline_access&redirect_uri=http%3A%2F%2Flocalhost%3A3000&client-request-id=8847b488-bc43-4592-9f26-ba05cbdfd3b9&response_mode=fragment&response_type=code&x-client-SKU=msal.js.browser&x-client-VER=2.16.1&x-client-OS=&x-client-CPU=&client_info=1&code_challenge=LxaDiShX-8Wd0KQbB-xDGx8g-2FsVH426bmhEmEr7qc&code_challenge_method=S256&nonce=98d4d9dc-9dcb-4a23-95e9-41b9b9287831&state=eyJpZCI6IjhiYmZiMGY3LWNjZmEtNGFiYS1hYTdhLWMwOTMzOWE3ZjlhZCIsIm1ldGEiOnsiaW50ZXJhY3Rpb25UeXBlIjoicmVkaXJlY3QifX0%3D")
 
@@ -52,6 +51,17 @@ def step_impl(context):
 def step_impl(context):
     wait = WebDriverWait(driver, 10)
     wait.until(EC.visibility_of_element_located((By.XPATH, "//*[@id='root']/section/section/header/div/div[1]/div/img")))
+    
+"""@then(u'I should see my personal dashboard')
+def step_impl(context):
+    wait = WebDriverWait(driver, 10)
+    try:
+        element = wait.until(EC.visibility_of_element_located((By.XPATH, "//*[@id='root']/section/section/header/div/div[1]/div/img")))
+    except TimeoutException:
+        f.adjuntar_captura_de_pantalla_a_reporte()
+        raise AssertionError("Elemento no encontrado en el tiempo especificado.")
+    # Si se encuentra el elemento, no hacer nada"""
+
 
 
 @when(u'I enter an invalid username and password')
@@ -90,4 +100,3 @@ def step_impl(context):
     usuario = context.config.userdata['usuario_sinregistro']
     clave = context.config.userdata['clave_registrado']
     ingresar_credenciales(usuario,clave)
-
